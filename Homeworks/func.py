@@ -11,6 +11,14 @@ def random_int_list_minus_n_to_n(number: int) -> list:
 
     return list
 
+def random_int_list_0_to_100(number: int) -> list:
+    list = []
+
+    for i in range(0, number):
+        list.append(random.randint(0, 101))
+
+    return list
+
 def random_float_list_minus_n_to_n(number: int) -> list:
     list = []
 
