@@ -1,58 +1,9 @@
-# Часто используемые функции, написанные мной.
+# Реализуйте RLE алгоритм: реализуйте модуль сжатия и восстановления данных.
+# Входные и выходные данные хранятся в отдельных текстовых файлах.
 
-import random
-from pathlib import Path
-
-def random_int_list_minus_n_to_n(number: int) -> list:
-    list = []
-
-    for i in range(0, number):
-        list.append(random.randint(-number, number+1))
-
-    return list
-
-def random_int_list_0_to_100(number: int) -> list:
-    list = []
-
-    for i in range(0, number):
-        list.append(random.randint(0, 101))
-
-    return list
-
-def random_float_list_minus_n_to_n(number: int) -> list:
-    list = []
-
-    for i in range(0, number):
-        list.append(round(random.randint(-number, number+1) + random.random(), 2))
-
-    return list
-
-
-def sum_of_elements_in_list(list: list) ->int:
-    sum = 0
-
-    for i in list:
-        sum+=i
-
-    return sum
-
-def check_for_int(check_number: str) ->bool:
-    try:
-        int(check_number)
-        return True
-    except: 
-        return False
-
-def import_string_from_file(file_path: str, input_file: str) ->str:
-    final_path = Path(file_path, input_file)
-    with open (final_path, 'r') as file:
-        return file.readline()
-
-def export_string_to_file(output_string: str,file_path: str, output_file: str) -> None:
-    final_path = Path(file_path, output_file)
-    with open (final_path, 'w') as file:
-        file.write(output_string)
-    return
+from curses.ascii import isdigit
+from func import import_string_from_file as impstr
+from func import export_string_to_file as expstr
 
 def RLE_encoder(input_string: str) ->str:
     output_string = str()
@@ -89,3 +40,12 @@ def RLE_decoder(input_string: str) ->str:
                 output_string += int(counter) * input_string[i]
                 counter = str()
     return(output_string)
+
+input_string = impstr('HWfiles', 'S5Hw4_RLE_input.txt')
+print(f'\nИсходная строка из файла:\n{input_string}')
+encoded_string = RLE_encoder(input_string)
+print(f'\nСжатая строка:\n{encoded_string}')
+expstr(encoded_string, 'HWfiles', 'S5Hw4_RLE_encoded.txt')
+decoded_string = RLE_decoder(encoded_string)
+print(f'\nДекодированная строка:\n{decoded_string}\n')
+expstr(decoded_string, 'HWfiles', 'S5Hw4_RLE_decoded.txt')
