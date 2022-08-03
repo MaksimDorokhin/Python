@@ -1,4 +1,5 @@
 import calc
+from logger import logger
 
 def input_num() ->int:
     a = str()
@@ -8,6 +9,7 @@ def input_num() ->int:
             return int(a)
         else:
             print('Введено не число!')
+            logger(f'Wrong input of number = {a}')
 
 
 def input_operation() ->str:
@@ -18,6 +20,7 @@ def input_operation() ->str:
             return a
         else:
             print('Введены неверные данные!')
+            logger(f'Wrong input of operation = {a}')
 
 def print_result(a: int, b: int, operation: str, result: float) -> None:
     print(f'{a} {operation} {b} = {result}')
