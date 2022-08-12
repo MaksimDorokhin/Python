@@ -4,5 +4,4 @@ i = -n
 
 while i <= n:
     print(i, end=' ')
-    i+=1
-
+    i += 1
