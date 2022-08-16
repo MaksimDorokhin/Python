@@ -57,12 +57,6 @@ class Info(StatesGroup):
     video = State()
 
 
-@dp.message_handler(text="Тест")
-async def test(message: types.Message):
-    await message.reply("Привет! Как тебя зовут?")
-    await message.reply("Как дела?")
-
-
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
     await bot.send_message(chat_id=message.chat.id, text=' Привет, я помогу тебе скачать видео с YouTube.',
