@@ -48,7 +48,7 @@ def turn_keyboard(turns: list):
 
 class TicTacToe(StatesGroup):
     waiting_for_player_select = State()
-    waiting_for_turn = State()
+    player_turn = State()
     game_end = State()
 
 
@@ -101,7 +101,7 @@ async def player_select(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
 
 
-@dp.callback_query_handler(Text(startswith="turn_"), state=TicTacToe.waiting_for_turn)
+@dp.callback_query_handler(Text(startswith="turn_"), state=TicTacToe.player_turn)
 async def next_turn(call: types.CallbackQuery, state: FSMContext):
     turns_dict = await state.get_data()
     if turns_dict['player'] == "X" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
@@ -111,11 +111,22 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
             await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
-        if ' ' not in turns_dict['turns']:
+        elif ' ' not in turns_dict['turns']:
             await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
-        await state.update_data(turns=cpu_turn("0", turns_dict['turns']))
+
+        await state.update_data(turns=cpu_turn('0', turns_dict['turns']))
+
+        if game_win('0', turns_dict['turns']):
+            await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
+        elif ' ' not in turns_dict['turns']:
+            await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
+
     elif turns_dict['player'] == "0" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
         turns_dict['turns'][int(call.data.split("_")[1])] = '0'
         await state.update_data(turns=turns_dict['turns'])
@@ -123,11 +134,21 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
             await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
-        if ' ' not in turns_dict['turns']:
+        elif ' ' not in turns_dict['turns']:
             await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
-        await state.update_data(turns=cpu_turn("Х", turns_dict['turns']))
+
+        await state.update_data(turns=cpu_turn('X', turns_dict['turns']))
+
+        if game_win('X', turns_dict['turns']):
+            await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
+        elif ' ' not in turns_dict['turns']:
+            await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
     else:
         await call.message.answer("Упс! Здесь уже кто-то походил, попробуйте снова!")
 
