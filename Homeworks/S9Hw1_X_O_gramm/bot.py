@@ -3,6 +3,7 @@ from os import getenv
 from random import randint
 from sys import exit
 
+import emoji
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
@@ -76,7 +77,8 @@ def game_win(player_id: str, turns: list) -> bool:
 
 @dp.message_handler(commands="start", state="*")
 async def cmd_start(message: types.Message):
-    await message.answer("Выберите, будете играть X или 0", reply_markup=player_select_keyboard())
+    await message.answer(f"{message.from_user.username}, выберите, будете играть крестиками или ноликами",
+                         reply_markup=player_select_keyboard())
     await TicTacToe.waiting_for_player_select.set()
 
 
@@ -85,7 +87,7 @@ async def player_select(call: types.CallbackQuery, state: FSMContext):
     action = call.data.split("_")[1]
     empty_list = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
     if action == "X":
-        await call.message.answer("Ок, играешь крестиками!")
+        await call.message.answer(f"Ок, играешь крестиками!")
         await state.update_data(player=action)
         await TicTacToe.next()
         await state.update_data(turns=empty_list)
@@ -108,7 +110,11 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
         turns_dict['turns'][int(call.data.split("_")[1])] = 'X'
         await state.update_data(turns=turns_dict['turns'])
         if game_win('X', turns_dict['turns']):
-            await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Вы выиграли! Поздравляем! " + emoji.emojize(":confetti_ball:"),
+                                      reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Ваша награда " + emoji.emojize(":trophy:"))
+            await types.ChatActions.upload_photo()
+            await call.message.answer_photo(f'https://yandex.ru/images/search?text=котики{randint(0, 1000)}')
             await TicTacToe.next()
             return
         elif ' ' not in turns_dict['turns']:
@@ -119,7 +125,8 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(turns=cpu_turn('0', turns_dict['turns']))
 
         if game_win('0', turns_dict['turns']):
-            await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Вы проиграли! Как вы могли... " + emoji.emojize(':see-no-evil_monkey:'),
+                                      reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
         elif ' ' not in turns_dict['turns']:
@@ -131,7 +138,11 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
         turns_dict['turns'][int(call.data.split("_")[1])] = '0'
         await state.update_data(turns=turns_dict['turns'])
         if game_win('0', turns_dict['turns']):
-            await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Вы выиграли! Поздравляем! " + emoji.emojize(":confetti_ball:"),
+                                      reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Ваша награда " + emoji.emojize(":trophy:"))
+            await types.ChatActions.upload_photo()
+            await call.message.answer_photo(f'https://yandex.ru/images/search?text=котики{randint(0, 1000)}')
             await TicTacToe.next()
             return
         elif ' ' not in turns_dict['turns']:
@@ -142,7 +153,8 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(turns=cpu_turn('X', turns_dict['turns']))
 
         if game_win('X', turns_dict['turns']):
-            await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await call.message.answer("Вы проиграли! Как вы могли... " + emoji.emojize(':see-no-evil_monkey:'),
+                                      reply_markup=turn_keyboard(turns_dict['turns']))
             await TicTacToe.next()
             return
         elif ' ' not in turns_dict['turns']:
@@ -157,5 +169,4 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
 
 
 if __name__ == "__main__":
-    # Запуск бота
     executor.start_polling(dp, skip_updates=True)
