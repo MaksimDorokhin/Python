@@ -49,7 +49,7 @@ def turn_keyboard(turns: list):
 class TicTacToe(StatesGroup):
     waiting_for_player_select = State()
     waiting_for_turn = State()
-    waiting_for_game_end = State()
+    game_end = State()
 
 
 def cpu_turn(cpu_id: str, turns: list) -> list:
@@ -106,17 +106,27 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
     turns_dict = await state.get_data()
     if turns_dict['player'] == "X" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
         turns_dict['turns'][int(call.data.split("_")[1])] = 'X'
+        await state.update_data(turns=turns_dict['turns'])
         if game_win('X', turns_dict['turns']):
             await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
             return
-        await state.update_data(turns=turns_dict['turns'])
+        if ' ' not in turns_dict['turns']:
+            await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
         await state.update_data(turns=cpu_turn("0", turns_dict['turns']))
     elif turns_dict['player'] == "0" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
         turns_dict['turns'][int(call.data.split("_")[1])] = '0'
+        await state.update_data(turns=turns_dict['turns'])
         if game_win('0', turns_dict['turns']):
             await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
             return
-        await state.update_data(turns=turns_dict['turns'])
+        if ' ' not in turns_dict['turns']:
+            await call.message.answer("Ничья! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
+            await TicTacToe.next()
+            return
         await state.update_data(turns=cpu_turn("Х", turns_dict['turns']))
     else:
         await call.message.answer("Упс! Здесь уже кто-то походил, попробуйте снова!")
