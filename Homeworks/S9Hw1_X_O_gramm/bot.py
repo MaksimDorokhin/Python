@@ -107,14 +107,14 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
     if turns_dict['player'] == "X" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
         turns_dict['turns'][int(call.data.split("_")[1])] = 'X'
         if game_win('X', turns_dict['turns']):
-            await call.message.answer("Выиграли крестики! Конец игры!")
+            await call.message.answer("Выиграли крестики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             return
         await state.update_data(turns=turns_dict['turns'])
         await state.update_data(turns=cpu_turn("0", turns_dict['turns']))
     elif turns_dict['player'] == "0" and turns_dict['turns'][int(call.data.split("_")[1])] == ' ':
         turns_dict['turns'][int(call.data.split("_")[1])] = '0'
         if game_win('0', turns_dict['turns']):
-            await call.message.answer("Выиграли нолики! Конец игры!")
+            await call.message.answer("Выиграли нолики! Конец игры!", reply_markup=turn_keyboard(turns_dict['turns']))
             return
         await state.update_data(turns=turns_dict['turns'])
         await state.update_data(turns=cpu_turn("Х", turns_dict['turns']))
