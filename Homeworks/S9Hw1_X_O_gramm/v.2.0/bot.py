@@ -47,6 +47,7 @@ async def difficulty_select(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(cpu_level='noob')
     elif action == 'god':
         await state.update_data(cpu_level='god')
+    await call.answer()
     await call.message.answer(f"Выберите, будете играть крестиками или ноликами",
                               reply_markup=player_select_keyboard())
 
@@ -61,16 +62,18 @@ async def player_select(call: types.CallbackQuery, state: FSMContext):
         await TicTacToe.next()
         await state.update_data(turns=empty_list)
         game_states = await state.get_data()
+        await call.answer()
         await call.message.answer("Делайте ваш ход!", reply_markup=turn_keyboard(game_states['turns']))
     elif action == '0':
         game_states = await state.get_data()
         await call.message.answer("Ок, играешь ноликами!")
         await state.update_data(player=action)
+        await call.answer()
+        await call.message.answer("Бот обдумывает ход...")
         await state.update_data(turns=cpu_turn('X', empty_list, game_states['cpu_level']))
         game_states = await state.get_data()
         await call.message.answer("Делайте ваш ход!", reply_markup=turn_keyboard(game_states['turns']))
         await TicTacToe.next()
-    await call.answer()
 
 
 @dp.callback_query_handler(Text(startswith="turn_"), state=TicTacToe.player_turn)
@@ -99,7 +102,7 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
             await call.message.answer(f"Может еще партеечку?\n"
                                       f"Для начала нажми /start " + emoji.emojize(':winking_face:'))
             return
-
+        await call.message.answer("Бот обдумывает ход...")
         await state.update_data(turns=cpu_turn('0', game_states['turns'], game_states['cpu_level']))
 
         if game_win('0', game_states['turns']):
@@ -143,7 +146,7 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
             await call.message.answer(f"Может еще партеечку?\n"
                                       f"Для начала нажми /start " + emoji.emojize(':winking_face:'))
             return
-
+        await call.message.answer("Бот обдумывает ход...")
         await state.update_data(turns=cpu_turn('X', game_states['turns'], game_states['cpu_level']))
 
         if game_win('X', game_states['turns']):
@@ -168,7 +171,7 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
 
     await call.message.answer("Делайте ваш ход!", reply_markup=turn_keyboard(game_states['turns']))
     await call.answer()
-    
+
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
