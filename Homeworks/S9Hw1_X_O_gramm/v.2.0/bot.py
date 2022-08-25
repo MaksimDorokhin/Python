@@ -87,8 +87,7 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
                                       reply_markup=turn_keyboard(game_states['turns']))
             await call.message.answer("Ваша награда " + emoji.emojize(":trophy:"))
             await types.ChatActions.upload_photo()
-            await call.message.answer_photo(f'https://yandex.ru/images/search?text=котик_{cat_dictionary()} '
-                                            f'{randint(0, 1000)}')
+            await call.message.answer_photo(f'https://yandex.ru/images/search?text={cat_dictionary()}')
             await TicTacToe.next()
             await types.ChatActions.typing()
             await sleep(1)
@@ -132,8 +131,7 @@ async def next_turn(call: types.CallbackQuery, state: FSMContext):
                                       reply_markup=turn_keyboard(game_states['turns']))
             await call.message.answer("Ваша награда " + emoji.emojize(":trophy:"))
             await types.ChatActions.upload_photo()
-            await call.message.answer_photo(f'https://yandex.ru/images/search?text=котик_{cat_dictionary()} '
-                                            f'{randint(0, 1000)}')
+            await call.message.answer_photo(f'https://yandex.ru/images/search?text={cat_dictionary()}')
             await TicTacToe.next()
             await types.ChatActions.typing()
             await sleep(1)
